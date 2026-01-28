@@ -1,15 +1,60 @@
-# Python UV Starter
+# Neuro-Tasting EEG 信号采集与可视化系统
 
-This is a simple Python [uv](https://docs.astral.uv) starter in Firebase Studio.
+## 1. 项目概述
 
-## Running
+本项目是一个基于Python的桌面应用程序，旨在通过蓝牙技术实时采集、处理和可视化脑电（EEG）信号。系统采用赛博朋克风格的UI，提供了一个用于神经反馈和数据分析的交互式平台。
 
+该应用主要功能包括：
+- **实时EEG数据采集**: 通过蓝牙低功耗（BLE）技术从 `RFstar_7FEA` 设备接收EEG数据。
+- **信号处理与分析**: 对原始EEG信号进行滤波、降噪，并实时计算多项神经指标。
+- **数据可视化**: 以动态图表和仪表盘的形式展示EEG波形、脑波频段能量、注意力和放松度等指标。
+- **会话管理**: 支持创建、开始、暂停和结束一个完整的EEG数据采集会话。
+- **历史回放**: [新增功能] 能够加载并回放之前保存的EEG会话数据，便于复盘分析。
+
+## 2. 技术栈
+
+- **核心语言**: Python 3.11+
+- **图形与界面**: Pygame
+- **科学计算**: NumPy, SciPy
+- **蓝牙通信**: Bleak
+- **打包工具**: PyInstaller (通过 `main_app.spec` 配置)
+
+## 3. 如何运行
+
+### a. 运行主程序
+
+直接通过Python解释器运行 `main_app.py` 即可启动应用程序。
+
+```bash
+python main_app.py
 ```
-uv run main.py
-```
 
-## Add dependencies
+### b. 构建可执行文件
 
+项目配置了PyInstaller，可以打包成单个独立的 `.exe` 文件。
+
+```bash
+pyinstaller main_app.spec
 ```
-uv add ruff
-```
+打包成功后，可在 `dist/` 目录下找到 `main_app.exe`。
+
+## 4. 项目结构
+
+- `main_app.py`: **主应用程序入口**。负责初始化Pygame、窗口管理、场景切换和主事件循环。
+- `config.py`: **全局配置文件**。包含UI设计尺寸、颜色、字体、文件路径等所有常量。
+- `bluetooth_core.py`: **蓝牙核心模块**。封装了使用 `Bleak` 库进行设备扫描、连接和数据接收的逻辑。
+- `eeg_engine.py`: **EEG处理引擎**。负责原始EEG数据的缓冲、滤波、频带分析（Alpha, Beta等）以及高级神经指标（如注意力、放松度）的计算。
+- `ui_components.py`: **UI组件库**。定义了如面板、按钮、文本输入框等可复用的UI元素。
+- `scene_*.py`: **场景模块**。
+  - `scene_menu.py`: 主菜单场景，提供开始新会话、查看历史、退出等选项。
+  - `scene_session.py`: EEG采集与可视化主场景，展示实时数据。
+  - `scene_history.py`: 历史数据回放场景。
+- `imgs/`: 存放UI所需的背景、图标等图片资源。
+
+## 5. 核心工作流
+
+1.  **启动与连接**: `main_app.py` 启动后，`bluetooth_core.py` 开始在后台扫描和连接EEG设备。
+2.  **数据采集**: 连接成功后，`bluetooth_core` 持续接收数据，并将其放入一个线程安全的队列中。
+3.  **数据处理**: `eeg_engine.py` 从队列中获取原始数据，执行滤波和信号处理，然后计算出各项指标。
+4.  **数据展示**: 当前的活动场景（主要是 `scene_session.py`）从 `eeg_engine` 获取处理后的数据，并调用 `ui_components.py` 中的元素将其在屏幕上绘制出来。
+5.  **状态切换**: 用户通过UI交互（如点击按钮）触发状态变更，`GameApp` 类捕获这些事件并切换到不同的场景（如从菜单切换到会话）。
