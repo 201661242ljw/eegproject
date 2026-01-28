@@ -8,6 +8,14 @@
     # pkgs.go
     pkgs.python314
     pkgs.uv
+    pkgs.gcc
+    pkgs.pkg-config
+    pkgs.SDL2
+    pkgs.SDL2_image
+    pkgs.SDL2_mixer
+    pkgs.SDL2_ttf
+    pkgs.SDL2_gfx
+    pkgs.freetype
     # pkgs.python311Packages.pip
     # pkgs.nodejs_20
     # pkgs.nodePackages.nodemon
