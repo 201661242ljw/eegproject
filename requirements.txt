@@ -1,1 +1,5 @@
-/usr/bin/bash: line 1: pip: command not found
+pygame
+numpy
+scipy
+bleak
+pyinstaller
